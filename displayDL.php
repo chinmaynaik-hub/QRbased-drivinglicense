@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Custom CSS -->
     <style>
         body {
@@ -110,6 +112,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: #155724;
             border-color: #c3e6cb;
         }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
@@ -139,11 +156,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $id = $row['id'];
                             $examDate = $row['examDate'];
 
+                            // Convert status to human-readable format
+                            $statusText = $status == 1 ? 'Approved' : 'Pending';
+                            $statusClass = $status == 1 ? 'status-approved' : 'status-pending';
+                            
                             echo "<div class='row'>
-                                    <div class='col-lg-6 m-auto d-block'>
+                                    <div class='col-lg-12'>
                                     <ul class='list-group'>
-                                    <li class='list-group-item text-muted' contenteditable='false'>DL Status</li>
-                                    <li class='list-group-item text-right'><span class='pull-left'><strong>Status:</strong></span>$status</li>
+                                    <li class='list-group-item text-muted' contenteditable='false'><center>DL Status</center></li>
+                                    
+                                    <li class='list-group-item text-right'>
+                                        <span class='pull-left'><strong>Status:</strong></span>
+                                        <span class='status-badge $statusClass'>$statusText</span>
+                                    </li>
+                                    
                                     <li class='list-group-item text-right'><span class='pull-left'><strong>Test Date:</strong></span>$examDate</li>
                                     <li class='list-group-item text-right'><span class='pull-left'><strong>RTO Office:</strong></span>$rto</li>
                                     <li class='list-group-item text-right'><span class='pull-left'><strong>Unique ID:</strong></span>$id</li>

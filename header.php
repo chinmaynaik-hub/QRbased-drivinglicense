@@ -54,7 +54,8 @@
                                         }
                                     }
                                     else 
-                                        print("<a href='adminLogin.php'>Admin Login</a>");
+                                      print("<a href='adminLogin.php' style='font-weight: bold; color: #fff; text-transform: uppercase;'>Admin Login</a>");
+
                                 ?>
                             </div>
                         </div>

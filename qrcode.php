@@ -19,7 +19,7 @@
     </div>
 </body>
 </html>
-<!DOCTYPE html>
+echo '<!DOCTYPE html>
 <html lang="en">
 <head>
     <style>
@@ -29,9 +29,8 @@
             align-items: center;
             height: 80vh;
             margin: 0;
-            background: url("rto2.png") no-repeat center center fixed;
+            background: url("rto.png") no-repeat center center fixed;
             background-size: contain;
-            
         }
         .container {
             text-align: center;
@@ -56,5 +55,5 @@
     </style>
 </head>
 
-</html>
-
+</html>';
+?>

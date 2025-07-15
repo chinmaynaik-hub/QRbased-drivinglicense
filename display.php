@@ -18,7 +18,7 @@
     <!-- Custom CSS -->
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color:rgba(96, 157, 219, 0.36);
         }
         .container {
             margin-top: 50px;
@@ -34,6 +34,22 @@
             background-color: #28a745;
             border: none;
         }
+        .showllno
+        {
+            background-color:rgba(184, 216, 41, 0.63);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: blue;
+            border-radius: 25px;
+        }
+        .titlepage{
+            color:black;
+            font-weight: bold;
+            background-color: #FBF3C1;
+            border-radius: 10px;
+            
+        }
     </style>
 </head>
 <body>
@@ -41,9 +57,11 @@
         <div class="col-lg-6 m-auto d-block">
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title text-center">Submitted Data</h3>
+                    <div class="titlepage">
+                    <h3 class="card-title text-center">Submitted Data</h3>                       
+                    </div>
                     <p><strong>Name:</strong> <?php echo $_SESSION['name']; ?></p>
-                    <p><strong>Father's Name:</strong> <?php echo $_SESSION['fatherName']; ?></p>
+                    <p><strong>Last Name:</strong> <?php echo $_SESSION['fatherName']; ?></p>
                     <p><strong>Date of Birth:</strong> <?php echo $_SESSION['dob']; ?></p>
                     <p><strong>Blood Group:</strong> <?php echo $_SESSION['bloodGroup']; ?></p>
                     <p><strong>Address:</strong> <?php echo $_SESSION['address']; ?></p>
@@ -55,6 +73,10 @@
                     <!--<p><strong>Unique ID:</strong> <?php echo $_SESSION['id']; ?></p>-->
                     <p><strong>Exam date : </strong> <?php echo $_SESSION['examDate']; ?></p>
                     <p><strong>License Type:</strong> <?php echo $_SESSION['licenseType']; ?></p>
+                    <div class="showllno">
+                        <p><strong>Learning License Number:</strong> <?php echo $_SESSION['llno']; ?></p>
+                    </div>
+                    
                     <h3 class="text-success text-center">Form Submitted Successfully</h3>
                     <div class="text-center">
                         <a href="index.php" class="btn btn-success mt-3">Go to Home</a>

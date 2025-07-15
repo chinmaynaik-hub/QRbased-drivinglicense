@@ -44,6 +44,7 @@
             <th scope="col">Aadhar Number</th>
             <th scope="col">LL No</th>
             <th scope="col">Name</th>
+            <th scope="col">Edit</th>
             </tr>
             </thead>
             <tbody>
@@ -52,7 +53,7 @@
                 <td><?php echo $row['aadhar'] ?></td>
                 <td><?php echo $row['llno'] ?></td>
                 <td><?php echo $row['name'] ?></td>
-                <th scope="col"> Edit</th>
+                
                 <td>
                 <form method="post">
                     <input type="submit" name="action" value="Edit"/>

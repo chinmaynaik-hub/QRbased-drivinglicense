@@ -65,15 +65,15 @@ if ($result->num_rows > 0) {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                height: 70vh;
+                height: 100vh;
                 margin: 0;
-                background: url("background copy.jpg") no-repeat center center fixed;
+                background: url("qrbgimg.png") no-repeat center center fixed;
                 background-size: cover;
             }
             .container {
                 text-align: center;
                 background: rgba(200, 255, 255, 0.8);
-                padding: 20px;
+                padding: 10px;
                 border-radius: 10px;
             }
             .download-button {
@@ -99,7 +99,14 @@ if ($result->num_rows > 0) {
     </body>
     </html>';
 } else {
-    echo "No matching records found.";
+    
+echo "<script>
+    alert('Invalid Credentials');
+    window.location.href = 'qrcode.php';
+</script>";
+exit(); // Ensures the PHP script stops executing
+
+
 }
 
 // Close connection

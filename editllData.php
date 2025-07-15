@@ -55,12 +55,12 @@
 					<span id="llnoerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="fatherName" class="font-weight-bold"> Father's Name: </label>
+					<label for="fatherName" class="font-weight-bold"> Last Name: </label>
 					<input type="text" name="fatherName" class="form-control" id="fatherName" value="<?php echo $row['fatherName'] ?>">
 					<span id="fatherNameerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="dob" class="font-weight-bold"> DOB No: </label>
+					<label for="dob" class="font-weight-bold"> DOB : </label>
 					<input type="text" name="dob" class="form-control" id="dob" value="<?php echo $row['dob'] ?>">
 					<span id="doberr" class="text-danger font-weight-bold"> </span>
 				</div>
@@ -75,9 +75,20 @@
 					<span id="addresserr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="gender" class="font-weight-bold"> Gender: </label>
-					<input type="text" name="gender" class="form-control" id="gender" value="<?php echo $row['gender'] ?>">
-					<span id="gendererr" class="text-danger font-weight-bold"> </span>
+					
+<div class="form-check">
+    <label class="font-weight-bold d-block">Select Gender:</label>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" 
+            <?php echo ($row['gender'] == 'Male') ? 'checked' : ''; ?>>
+        <label class="form-check-label" for="genderMale">Male</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female"
+            <?php echo ($row['gender'] == 'Female') ? 'checked' : ''; ?>>
+        <label class="form-check-label" for="genderFemale">Female</label>
+    </div>
+</div>
 				</div>
                 <div class="form-group">
 					<label for="mobileNumber" class="font-weight-bold"> Mobile Number: </label>
@@ -110,10 +121,13 @@
                         <span id="licenseTypeerr" class="text-danger font-weight-bold"> </span>
                     </div>
                 <div class="form-group">
-					<label for="status" class="font-weight-bold"> Status (0-pending, 1- approved): </label>
-					<input type="number" name="status" class="form-control" id="status" value="<?php echo $row['status'] ?>">
-					<span id="statuserr" class="text-danger font-weight-bold"> </span>
-				</div>
+                    <label for="status" class="font-weight-bold">Status:</label>
+                    <select name="status" class="form-control" id="status">
+                        <option value="0" <?php echo ($row['status'] == 0) ? 'selected' : ''; ?>>Not Approved</option>
+                        <option value="1" <?php echo ($row['status'] == 1) ? 'selected' : ''; ?>>Approved</option>
+                    </select>
+                    <span id="statuserr" class="text-danger font-weight-bold"></span>
+                </div>
                 <div class="form-group">
 					<label for="validity" class="font-weight-bold"> Validity </label>
 					<input type="date" name="validity" class="form-control" id="validity" value="<?php echo $row['validity'] ?>">
@@ -143,7 +157,7 @@
             }
             var fatherName = document.getElementById('fatherName').value;
             if (fatherName == "") {
-                document.getElementById('fatherNameerr').innerHTML =" ** Please fill the fatherName field";
+                document.getElementById('fatherNameerr').innerHTML =" ** Please fill the lastName field";
                 return false;
             }
             var dob = document.getElementById('dob').value;
