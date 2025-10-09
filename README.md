@@ -1,4 +1,4 @@
-# 🚗 RTO Management System
+# QR code based Driving license system (RTO Management System)
 
 The **RTO Management System** is a web-based application designed to digitalize and secure the driving license management process.  
 Our main goal is to reduce data leaks when a person loses their driving license by embedding user information in a **QR code** — making it **non-human readable** and viewable only by authorized personnel.
@@ -95,4 +95,5 @@ Download and install **[XAMPP](https://www.apachefriends.org/)** to run Apache a
 ## 📜 License
 
 This project is open-source and available under the **MIT License**.
+
 
