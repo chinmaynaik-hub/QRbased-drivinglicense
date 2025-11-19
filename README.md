@@ -87,7 +87,7 @@ Download and install **[XAMPP](https://www.apachefriends.org/)** to run Apache a
 
 ## 👩‍💻 Contributors
 
-- Chinmay [Project Developer]
+- Chinmay Naik [Project Developer]
 - Team Members: [Chetan, Chinmay soratur, Bheemanagowda]
 
 ---
@@ -95,5 +95,6 @@ Download and install **[XAMPP](https://www.apachefriends.org/)** to run Apache a
 ## 📜 License
 
 This project is open-source and available under the **MIT License**.
+
 
 
