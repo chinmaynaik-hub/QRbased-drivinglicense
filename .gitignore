@@ -1,0 +1,27 @@
+# Composer dependencies
+/vendor/
+
+# Generated QR Codes
+/qr_codes/
+# Environments
+.env
+.env.local
+
+# IDEs and Editors
+/.vscode/
+/.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Log files
+*.log
