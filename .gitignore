@@ -25,3 +25,7 @@ desktop.ini
 
 # Log files
 *.log
+
+# CSS files
+.sass-cache/
+*.css.map
