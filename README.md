@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-﻿# RTO-Management-System
-Create a database rto in phpmyadmin and import rto.sql from database folder.
-=======
 # QR code based Driving license system (RTO Management System)
 
 The **RTO Management System** is a web-based application designed to digitalize and secure the driving license management process.  
@@ -102,4 +98,3 @@ This project is open-source and available under the **MIT License**.
 
 
 
->>>>>>> 4e45ff16669502f974f6d10284586e16263996b4
