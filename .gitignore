@@ -29,3 +29,4 @@ desktop.ini
 # CSS files
 .sass-cache/
 *.css.map
+.env
