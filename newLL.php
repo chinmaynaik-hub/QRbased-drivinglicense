@@ -17,7 +17,7 @@
     $licenseType = '';
 
     if (isset($_POST['submit'])) {
-        require_once('Connection.php');
+        require_once('config/Connection.php');
 
         // Retrieve form data
         $name = $_POST['name'];
@@ -108,7 +108,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <?php require_once('header.php'); ?>
+    <?php require_once('includes/header.php'); ?>
     <br>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> New LL Registration </h1>
     <div class="container"><br>
@@ -271,17 +271,17 @@
             return isValid;
         }
     </script>
-    <?php require_once('footer.php'); ?>
+    <?php require_once('includes/footer.php'); ?>
     <!-- ##### All Javascript Script ##### -->
     <!-- jQuery-2.2.4 js -->
-    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
-    <script src="js/bootstrap/popper.min.js"></script>
+    <script src="assets/js/bootstrap/popper.min.js"></script>
     <!-- Bootstrap js -->
-    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
     <!-- All Plugins js -->
-    <script src="js/plugins/plugins.js"></script>
+    <script src="assets/js/plugins/plugins.js"></script>
     <!-- Active js -->
-    <script src="js/active.js"></script>
+    <script src="assets/js/active.js"></script>
 </body>
 </html>

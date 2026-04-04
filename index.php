@@ -15,13 +15,13 @@
     <!-- <link rel="icon" href="img/core-img/favicon.ico"> -->
 
     <!-- Core Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
 
 </head>
 
 <body>
     
-    <?php require_once('header.php'); ?>
+    <?php require_once('includes/header.php'); ?>
     <!-- ##### Hero Area Start ##### -->
     <section class="hero-area">
         <div class="hero-slides owl-carousel">
@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-12 col-md-5">
                             <div class="hero-slides-thumb" >
-                                <img src="img/bg-img/rto.png" alt="">
+                                <img src="/RTO_Bheemanna/assets/img/bg-img/rto.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -52,18 +52,18 @@
     <!-- ##### Hero Area End ##### -->
 
     <!-- ##### Footer Area Start ##### -->
-    <?php require_once('footer.php'); ?>
+    <?php require_once('includes/footer.php'); ?>
     <!-- ##### All Javascript Script ##### -->
     <!-- jQuery-2.2.4 js -->
-    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
-    <script src="js/bootstrap/popper.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
     <!-- Bootstrap js -->
-    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
     <!-- All Plugins js -->
-    <script src="js/plugins/plugins.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
     <!-- Active js -->
-    <script src="js/active.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
 </body>
 
 </html>

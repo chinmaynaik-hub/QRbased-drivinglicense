@@ -5,7 +5,7 @@ $aadhar = '';
 $aadharerr = '';
 
 if (isset($_POST['submit'])) {
-    require_once('Connection.php');
+    require_once('config/Connection.php');
     session_start();
 
     $aadhar = trim($_POST['aadhar']);
@@ -48,7 +48,7 @@ if (isset($_POST['submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<?php require_once('header.php'); ?>
+<?php require_once('includes/header.php'); ?>
 <br>
 <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;">Check DL Status</h1>
 
@@ -84,13 +84,13 @@ function validation() {
 }
 </script>
 
-<?php require_once('footer.php'); ?>
+<?php require_once('includes/footer.php'); ?>
 
 <!-- ##### All Javascript Script ##### -->
-<script src="js/jquery/jquery-2.2.4.min.js"></script>
-<script src="js/bootstrap/popper.min.js"></script>
-<script src="js/bootstrap/bootstrap.min.js"></script>
-<script src="js/plugins/plugins.js"></script>
-<script src="js/active.js"></script>
+<script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="assets/js/bootstrap/popper.min.js"></script>
+<script src="assets/js/bootstrap/bootstrap.min.js"></script>
+<script src="assets/js/plugins/plugins.js"></script>
+<script src="assets/js/active.js"></script>
 </body>
 </html>

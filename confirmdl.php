@@ -1,7 +1,7 @@
 <?php
 ob_start(); // Start output buffering
 session_start();
-require_once('header.php');
+require_once('includes/header.php');
 
 // Redirect if session is not set
 if (!isset($_SESSION['llno']) || !isset($_SESSION['aadhar'])) {
@@ -9,7 +9,7 @@ if (!isset($_SESSION['llno']) || !isset($_SESSION['aadhar'])) {
     exit();
 }
 
-require_once('Connection.php');
+require_once('config/Connection.php');
 $llno = $_SESSION['llno'];
 $aadhar = $_SESSION['aadhar'];
 
@@ -106,13 +106,13 @@ if (isset($_POST['confirm'])) {
 }
 ?>
 
-<?php require_once('footer.php'); ?>
+<?php require_once('includes/footer.php'); ?>
 
 <!-- ##### All Javascript Script ##### -->
-<script src="js/jquery/jquery-2.2.4.min.js"></script>
-<script src="js/bootstrap/popper.min.js"></script>
-<script src="js/bootstrap/bootstrap.min.js"></script>
-<script src="js/plugins/plugins.js"></script>
-<script src="js/active.js"></script>
+<script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
+<script src="assets/js/bootstrap/popper.min.js"></script>
+<script src="assets/js/bootstrap/bootstrap.min.js"></script>
+<script src="assets/js/plugins/plugins.js"></script>
+<script src="assets/js/active.js"></script>
 </body>
 </html>
