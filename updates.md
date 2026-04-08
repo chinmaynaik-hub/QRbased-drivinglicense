@@ -217,6 +217,22 @@ WHERE p.aadhar = 1234567890;
 
 ---
 
+## PHP Files That Need Updates
+
+### Files to Update:
+1.  `newDL.php` - Insert into new normalized tables
+2.  `newLL.php` - Insert into new normalized tables
+3.  `showdl.php` - Display using JOINs
+4.  `showll.php` - Display using JOINs
+5.  `checkDLStatus.php` - Query new structure
+6.  `checkLLStatus.php` - Query new structure
+7.  `admin/viewdlData.php` - Admin view with JOINs
+8.  `admin/viewllData.php` - Admin view with JOINs
+9.  `admin/editdldata.php` - Edit operations
+10. `admin/editllData.php` - Edit operations
+
+---
+
 **Database Version:** rto_new  
 **Last Updated:** April 8, 2026  
 **Normalization Level:** 3NF (Third Normal Form)

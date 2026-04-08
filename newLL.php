@@ -36,7 +36,7 @@
         $db = $obj->getNewConnection();
 
         // Check if Aadhar number is already registered
-        $q = "SELECT * FROM ll WHERE aadhar='$aadhar'";
+        $q = "SELECT * FROM person WHERE aadhar='$aadhar'";
         $r = $db->query($q);
 
         if ($r->num_rows > 0) {
@@ -50,7 +50,7 @@
             
             while (!$llnoGenerated && $attempts < $maxAttempts) {
                 $llno = mt_rand(1000, 999999); // Generate 6-digit number
-                $checkSql = "SELECT * FROM ll WHERE llno=$llno";
+                $checkSql = "SELECT * FROM licenses WHERE licenseNumber='LL_$llno'";
                 $checkResult = $db->query($checkSql);
                 
                 if ($checkResult->num_rows === 0) {
@@ -67,10 +67,80 @@
             $examDate = date('Y-m-d', strtotime($Date . ' + 15 days'));
             
             // Insert with generated llno
-            $sql = "INSERT INTO ll(name, LastName, dob, bloodGroup, address, aadhar, gender, mobileNumber, email, rto, status, examDate, licenseType, llno) 
-                    VALUES('$name', '$fatherName', '$dob', '$bloodGroup', '$address', '$aadhar', '$gender', '$mobileNumber', '$email', '$rto', 0, '$examDate', '$licenseType', '$llno')";
+            // $sql = "INSERT INTO ll(name, LastName, dob, bloodGroup, address, aadhar, gender, mobileNumber, email, rto, status, examDate, licenseType, llno) 
+            //         VALUES('$name', '$fatherName', '$dob', '$bloodGroup', '$address', '$aadhar', '$gender', '$mobileNumber', '$email', '$rto', 0, '$examDate', '$licenseType', '$llno')";
                     
-            $res = $db->query($sql);
+            $sql_person = "INSERT INTO PERSON (aadhar, name, fatherName, dob, bloodGroup, gender, address, mobileNumber, email) VALUES ('$aadhar', '$name', '$fatherName', '$dob', '$bloodGroup', '$gender', '$address', '$mobileNumber', '$email')";
+
+            $res_person = $db->query($sql_person);
+
+            if($res_person){
+
+                //gets autoincrement number of last inserted data
+                $person_id = $db->insert_id;
+
+                // we should have all the details before
+                // we should only fetch from here
+                $sql_rto = "SELECT rto_id FROM rtooffices where rto_id = '$rto' limit 1";
+                $res_rto = $db->query($sql_rto);
+
+                if($res_rto->num_rows > 0){
+                    $row_rto = $res_rto->fetch_assoc();
+                    $rto_id = $row_rto["rto_id"];
+                } else {
+                    //show error
+                    die("RTO does not exist");
+                }
+
+                // Process ALL selected license types and insert separate records
+                $licenseTypeArray = explode(",", $licenseType);
+                $allInserted = true;
+                
+                foreach($licenseTypeArray as $classCode) {
+                    $classCode = trim($classCode);
+                    
+                    // Get class_id for this vehicle class
+                    $sql_class = "SELECT class_id FROM vehicleclasses WHERE classCode = '$classCode' LIMIT 1";
+                    $resClass = $db->query($sql_class);
+                    
+                    if ($resClass->num_rows > 0) {
+                        $rowClass = $resClass->fetch_assoc();
+                        $class_id = $rowClass['class_id'];
+                        
+                        // Generate unique license number for this class
+                        $licenseNumber = "LL_" . $llno . "_" . $classCode;
+                        
+                        // Calculate validity (6 months from issue date)
+                        $issueDate = date("Y-m-d");
+                        $validityDate = date("Y-m-d", strtotime($issueDate . ' + 6 months'));
+                        
+                        // Insert license record for this class
+                        $sql_license = "INSERT INTO licenses 
+                                       (licenseNumber, person_id, licenseType, class_id, rto_id, issueDate, examDate, validityDate, status) 
+                                       VALUES 
+                                       ('$licenseNumber', $person_id, 'LL', $class_id, $rto_id, '$issueDate', '$examDate', '$validityDate', 0)";
+                        
+                        $res_license = $db->query($sql_license);
+                        
+                        if (!$res_license) {
+                            echo "Error inserting license for $classCode: " . $db->error;
+                            $allInserted = false;
+                            break;
+                        }
+                    } else {
+                        echo "Vehicle class '$classCode' not found in database";
+                        $allInserted = false;
+                        break;
+                    }
+                }
+                
+                // Set $res based on whether all licenses were inserted
+                $res = $allInserted;
+
+            } else {
+                $res = false;
+                echo "Error inserting person: " . $db->error;
+            }
 
             if ($res) {
                 $_SESSION['name'] = $name;
