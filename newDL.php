@@ -3,6 +3,7 @@
     $aadhar ='';
     $llnoerr = '';
     $aadharerr ='';
+    
 
     if (isset($_POST['submit'])) {
         require_once('config/Connection.php');
@@ -22,29 +23,49 @@
             $obj = new Connection();
             $db = $obj->getNewConnection();
 
-            // Prepared statement to prevent SQL injection
-            $sql = "SELECT * FROM ll WHERE llno = ? AND aadhar = ?";
+            // Query normalized structure - check if person has approved LL
+            $sql = "SELECT l.*, p.aadhar, r.rto_id, r.rtoName
+            FROM licenses l 
+            JOIN person p ON l.person_id = p.person_id
+            JOIN rtooffices r ON l.rto_id = r.rto_id
+            WHERE l.licenseNumber LIKE ?
+            AND p.aadhar = ?
+            AND l.licenseType = 'LL'
+            LIMIT 1";
+
+            $llnoPattern = "LL_".$llno."%";
             $stmt = $db->prepare($sql);
-            $stmt->bind_param('ii', $llno, $aadhar); // 'ii' means two integers
+            $stmt->bind_param('ss', $llnoPattern, $aadhar);
             $stmt->execute();
             $res = $stmt->get_result();
             $row = $res->fetch_assoc();
 
             if ($row) {
-                $rto = $row['rto'];
-                if ($row['status'] == 0) {
-                    $aadharerr = "Status Pending";
-                } else {
+                $rto_id = $row['rto_id'];
+                $rto_name = $row['rtoName'];
+                $person_id = $row['person_id'];
+                
+                // Check status (ENUM: 'pending', 'approved', 'rejected', 'expired')
+                if ($row['status'] == 'pending') {
+                    $aadharerr = "LL Status Pending - Cannot apply for DL yet";
+                } else if ($row['status'] == 'rejected') {
+                    $aadharerr = "LL was rejected - Cannot apply for DL";
+                } else if ($row['status'] == 'expired') {
+                    $aadharerr = "LL has expired - Cannot apply for DL";
+                } else if ($row['status'] == 'approved') {
+                    // LL is approved, allow DL application
                     $_SESSION['llno'] = $llno;
                     $_SESSION['aadhar'] = $aadhar;
-                    $_SESSION['rto'] = $rto;
+                    $_SESSION['rto_id'] = $rto_id;
+                    $_SESSION['rto_name'] = $rto_name;
+                    $_SESSION['person_id'] = $person_id;
                     header("Location: confirmdl.php");
                     die();
+                } else {
+                    $aadharerr = "LL status is invalid: " . $row['status'];
                 }
             } else {
-                if ($res->num_rows == 0) {
-                    $llnoerr = "Invalid LL No or Aadhar No";
-                }
+                $llnoerr = "Invalid LL No or Aadhar No, or no LL found";
             }
 
             $db->close();
