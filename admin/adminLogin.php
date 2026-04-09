@@ -11,8 +11,8 @@ $loginError = false;
 
 if (isset($_POST['submit'])) {
     require_once('../config/Connection.php');
-    $username = $_POST['username'];
-    $pass = $_POST['password'];
+    $username = trim($_POST['username']);  // Remove whitespace
+    $pass = trim($_POST['password']);      // Remove whitespace
 
     $obj = new Connection();
     $db = $obj->getNewConnection();
@@ -23,14 +23,20 @@ if (isset($_POST['submit'])) {
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
-    $db->close();
 
-    if ($row && $row['username'] === $username && $row['password'] === $pass) {
+    if ($row) {
+        // Login successful
         $_SESSION['loggedin'] = 1;
+        $_SESSION['admin_id'] = $row['admin_id'];
+        $_SESSION['username'] = $row['username'];
+        $db->close();
         header("Location: adminPanel.php");
         exit();
     } else {
-        $loginError = true; // Trigger alert on page
+        // Login failed - for debugging
+        $loginError = true;
+        $debug_msg = "Username: '$username' (length: " . strlen($username) . "), Password: '$pass' (length: " . strlen($pass) . ")";
+        $db->close();
     }
 }
 ?>
@@ -89,7 +95,7 @@ if (isset($_POST['submit'])) {
 
     // Show login error alert if credentials were invalid
     <?php if ($loginError): ?>
-        alert("Invalid username or password.");
+        alert("Invalid username or password.\n\nDebug info: <?php echo isset($debug_msg) ? $debug_msg : 'No debug info'; ?>");
     <?php endif; ?>
 </script>
 
