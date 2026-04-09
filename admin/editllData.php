@@ -1,21 +1,53 @@
-
 <?php
     session_start();
     require_once('../config/Connection.php');
-    $aadhar = $_SESSION['aadhar'];
-    // echo $aadhar;
-    // die();
+    
+    // Get license_id from session (set in viewllData.php)
+    $license_id = $_SESSION['license_id'];
+    
     $obj = new Connection();
     $db = $obj->getNewConnection();
-    $sql = "select * from ll where aadhar=$aadhar";
+    
+    // Query to get license data with JOINs
+    $sql = "SELECT 
+                l.license_id,
+                l.licenseNumber,
+                l.status,
+                l.issueDate,
+                l.examDate,
+                l.validityDate,
+                p.person_id,
+                p.aadhar,
+                p.name,
+                p.fatherName,
+                p.dob,
+                p.bloodGroup,
+                p.gender,
+                p.address,
+                p.mobileNumber,
+                p.email,
+                r.rto_id,
+                r.rtoName,
+                r.rtoCode,
+                vc.class_id,
+                vc.classCode,
+                vc.classDescription
+            FROM licenses l 
+            JOIN person p ON l.person_id = p.person_id
+            JOIN rtooffices r ON l.rto_id = r.rto_id
+            JOIN vehicleclasses vc ON l.class_id = vc.class_id    
+            WHERE l.license_id = $license_id";
+
     $res = $db->query($sql);
     $row = $res->fetch_assoc();
-    $vehicleType = $row ['licenseType'];
-    $vtype = explode(',', $vehicleType);
+    
+    if (!$row) {
+        die("License not found");
+    }
+    
     if (isset($_POST['submit']))
     {
         $name = $_POST['name'];
-        $llno = $_POST['llno'];
         $fatherName = $_POST['fatherName'];
         $dob = $_POST['dob'];
         $bloodGroup = $_POST['bloodGroup'];
@@ -23,21 +55,35 @@
         $gender = $_POST['gender'];
         $mobileNumber = $_POST['mobileNumber'];
         $email = $_POST['email'];
-        $rto = $_POST['rto'];
+        $rto_id = $_POST['rto_id'];
         $status = $_POST['status'];
-        $validity = $_POST['validity'];
+        $validityDate = $_POST['validity'];
         $issueDate = $_POST['issueDate'];
-        $selectedLicenseTypes = isset($_POST['licenseType']) ? implode(',', $_POST['licenseType']) : '';
 
-        $q = "update ll 
-        set name='$name', llno=$llno, LastName='$fatherName', 
-        dob='$dob', bloodGroup='$bloodGroup', address='$address', gender='$gender', 
-        mobileNumber=$mobileNumber, email='$email', rto='$rto', status=$status, validity='$validity', issueDate='$issueDate',licenseType = '$selectedLicenseTypes' where aadhar=$aadhar"; 
-        $res1 = $db->query($q);
-        if (!$res1)
+        // Update person table
+        $person_id = $row['person_id'];
+        $q_person = "UPDATE person 
+                    SET name='$name', fatherName='$fatherName', 
+                        dob='$dob', bloodGroup='$bloodGroup', 
+                        address='$address', gender='$gender', 
+                        mobileNumber='$mobileNumber', email='$email' 
+                    WHERE person_id=$person_id";
+        
+        $res_person = $db->query($q_person);
+        
+        // Update license table
+        $q_license = "UPDATE licenses 
+                     SET rto_id=$rto_id, status='$status', 
+                         validityDate='$validityDate', issueDate='$issueDate' 
+                     WHERE license_id=$license_id";
+        
+        $res_license = $db->query($q_license);
+        
+        if (!$res_person || !$res_license) {
             die($db->error);
+        }
+        
         $db->close();
-        // session_destroy();
         header("Location: viewllData.php");
         die();
     }
@@ -56,18 +102,17 @@
 					<span id="nameerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="llno" class="font-weight-bold"> LL No: </label>
-					<input type="number" name="llno" class="form-control" id="llno" value="<?php echo $row['llno'] ?>">
-					<span id="llnoerr" class="text-danger font-weight-bold"> </span>
+					<label for="licenseNumber" class="font-weight-bold"> License Number: </label>
+					<input type="text" name="licenseNumber" class="form-control" id="licenseNumber" value="<?php echo $row['licenseNumber'] ?>" readonly>
 				</div>
                 <div class="form-group">
 					<label for="fatherName" class="font-weight-bold"> Last Name: </label>
-					<input type="text" name="fatherName" class="form-control" id="fatherName" value="<?php echo $row['LastName'] ?>">
+					<input type="text" name="fatherName" class="form-control" id="fatherName" value="<?php echo $row['fatherName'] ?>">
 					<span id="fatherNameerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="dob" class="font-weight-bold"> DOB : </label>
-					<input type="text" name="dob" class="form-control" id="dob" value="<?php echo $row['dob'] ?>">
+					<label for="dob" class="font-weight-bold"> DOB: </label>
+					<input type="date" name="dob" class="form-control" id="dob" value="<?php echo $row['dob'] ?>">
 					<span id="doberr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
@@ -81,20 +126,17 @@
 					<span id="addresserr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					
-<div class="form-check">
-    <label class="font-weight-bold d-block">Select Gender:</label>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" 
-            <?php echo ($row['gender'] == 'Ma') ? 'checked' : ''; ?>>
-        <label class="form-check-label" for="genderMale">Male</label>
-    </div>
-    <div class="form-check">
-        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female"
-            <?php echo ($row['gender'] == 'Fe') ? 'checked' : ''; ?>>
-        <label class="form-check-label" for="genderFemale">Female</label>
-    </div>
-</div>
+					<label class="font-weight-bold d-block">Select Gender:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" 
+                            <?php echo ($row['gender'] == 'Male' || $row['gender'] == 'Ma' || $row['gender'] == 'M') ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="genderMale">Male</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female"
+                            <?php echo ($row['gender'] == 'Female' || $row['gender'] == 'Fe' || $row['gender'] == 'F') ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="genderFemale">Female</label>
+                    </div>
 				</div>
                 <div class="form-group">
 					<label for="mobileNumber" class="font-weight-bold"> Mobile Number: </label>
@@ -107,40 +149,32 @@
 					<span id="emailerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="rto" class="font-weight-bold"> RTO: </label>
-					<input type="text" name="rto" class="form-control" id="rto" value="<?php echo $row['rto'] ?>">
+					<label for="rto_id" class="font-weight-bold"> RTO: </label>
+					<input type="text" name="rto_display" class="form-control" value="<?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?>" readonly>
+                    <input type="hidden" name="rto_id" value="<?php echo $row['rto_id'] ?>">
 					<span id="rtoerr" class="text-danger font-weight-bold"> </span>
-                    <div class="form-group">
-                        <label class="font-weight-bold" style="margin-right: 100px;"> Select License Type: </label><br>
-                        <input type="checkbox" name="licenseType[]" value="MCWOG" id="mcwog" 
-                        <?php echo in_array('MCWOG', $vtype) ? 'checked' : ''; ?>>
-                        <label for="mcwog" style="margin-left: 5px;"> MCWOG </label><br>
-                        <input type="checkbox" name="licenseType[]" value="MCWG" id="mcwg"
-                        <?php echo in_array('MCWG', $vtype) ? 'checked' : ''; ?>>
-                        <label for="mcwg" style="margin-left: 5px;"> MCWG </label><br>
-                        <input type="checkbox" name="licenseType[]" value="LMV" id="lmv"
-                        <?php echo in_array('LMV', $vtype) ? 'checked' : ''; ?>>
-                        <label for="lmv" style="margin-left: 5px;"> LMV </label><br>
-                        <input type="checkbox" name="licenseType[]" value="HMV" id="hmv"
-                        <?php echo in_array('HMV', $vtype) ? 'checked' : ''; ?>>
-                        <label for="hmv" style="margin-left: 5px;"> HMV </label><br>
-                        <span id="licenseTypeerr" class="text-danger font-weight-bold"> </span>
-                    </div>
+				</div>
+                <div class="form-group">
+                    <label for="classCode" class="font-weight-bold"> Vehicle Class: </label>
+                    <input type="text" name="classCode" class="form-control" value="<?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?>" readonly>
+                </div>
                 <div class="form-group">
                     <label for="status" class="font-weight-bold">Status:</label>
                     <select name="status" class="form-control" id="status">
-                        <option value="0" <?php echo ($row['status'] == 0) ? 'selected' : ''; ?>>Not Approved</option>
-                        <option value="1" <?php echo ($row['status'] == 1) ? 'selected' : ''; ?>>Approved</option>
+                        <option value="pending" <?php echo ($row['status'] == 'pending') ? 'selected' : ''; ?>>Pending</option>
+                        <option value="approved" <?php echo ($row['status'] == 'approved') ? 'selected' : ''; ?>>Approved</option>
+                        <option value="rejected" <?php echo ($row['status'] == 'rejected') ? 'selected' : ''; ?>>Rejected</option>
+                        <option value="expired" <?php echo ($row['status'] == 'expired') ? 'selected' : ''; ?>>Expired</option>
                     </select>
                     <span id="statuserr" class="text-danger font-weight-bold"></span>
                 </div>
                 <div class="form-group">
-					<label for="validity" class="font-weight-bold"> Validity </label>
-					<input type="date" name="validity" class="form-control" id="validity" value="<?php echo $row['validity'] ?>">
+					<label for="validity" class="font-weight-bold"> Validity: </label>
+					<input type="date" name="validity" class="form-control" id="validity" value="<?php echo $row['validityDate'] ?>">
 					<span id="validityerr" class="text-danger font-weight-bold"> </span>
 				</div>
                 <div class="form-group">
-					<label for="issueDate" class="font-weight-bold"> Issue Date </label>
+					<label for="issueDate" class="font-weight-bold"> Issue Date: </label>
 					<input type="date" name="issueDate" class="form-control" id="issueDate" value="<?php echo $row['issueDate'] ?>">
 					<span id="issueDateerr" class="text-danger font-weight-bold"> </span>
 				</div>
