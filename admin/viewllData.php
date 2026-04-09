@@ -15,11 +15,41 @@
     require_once('../config/Connection.php');
     $obj = new Connection();
     $db = $obj->getNewConnection();
-    $sql = "select * from ll";
+    
+    // Query with JOINs to get all LL data from normalized tables
+    $sql = "SELECT 
+                l.license_id,
+                l.licenseNumber,
+                l.status,
+                l.issueDate,
+                l.examDate,
+                l.validityDate,
+                p.person_id,
+                p.aadhar,
+                p.name,
+                p.fatherName,
+                p.dob,
+                p.bloodGroup,
+                p.gender,
+                p.address,
+                p.mobileNumber,
+                p.email,
+                r.rtoName,
+                r.rtoCode,
+                vc.classCode,
+                vc.classDescription
+            FROM licenses l
+            JOIN person p ON l.person_id = p.person_id
+            JOIN rtooffices r ON l.rto_id = r.rto_id
+            JOIN vehicleclasses vc ON l.class_id = vc.class_id
+            WHERE l.licenseType = 'LL'
+            ORDER BY l.issueDate DESC";
+    
     $res = $db->query($sql);
+    
     if (isset($_POST['action']) && isset($_POST['id'])) {
         if ($_POST['action'] == 'Edit') {
-            $_SESSION['aadhar'] = $_POST['id'];
+            $_SESSION['license_id'] = $_POST['id'];
             header('Location: editllData.php');
             die();
         }
@@ -38,30 +68,50 @@
     <?php require_once('../includes/header.php'); ?>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> View LL Data </h1>
     <form method="post">
-        <table class="table">
-            <thead>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
             <tr>
-            <th scope="col">Aadhar Number</th>
-            <th scope="col">LL No</th>
+            <th scope="col">License Number</th>
             <th scope="col">Name</th>
-            <th scope="col">Edit</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Aadhar</th>
+            <th scope="col">DOB</th>
+            <th scope="col">Vehicle Class</th>
+            <th scope="col">RTO</th>
+            <th scope="col">Status</th>
+            
             </tr>
             </thead>
             <tbody>
             <?php while ($row = $res->fetch_assoc()) : ?>
             <tr>
-                <td><?php echo $row['aadhar'] ?></td>
-                <td><?php echo $row['llno'] ?></td>
+                <td><?php echo $row['licenseNumber'] ?></td>
                 <td><?php echo $row['name'] ?></td>
+                <td><?php echo $row['fatherName'] ?></td>
+                <td><?php echo $row['aadhar'] ?></td>
+                <td><?php echo $row['dob'] ?></td>
+                
+                <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
+                <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
+                <td>
+                    <span class="badge badge-<?php 
+                        echo $row['status'] == 'approved' ? 'success' : 
+                            ($row['status'] == 'pending' ? 'warning' : 
+                            ($row['status'] == 'rejected' ? 'danger' : 'secondary')); 
+                    ?>">
+                        <?php echo ucfirst($row['status']) ?>
+                    </span>
+                </td>
                 
                 <td>
                 <form method="post">
-                    <input type="submit" name="action" value="Edit"/>
-                    <input type="hidden" name="id" value="<?php echo $row['aadhar']; ?>"/>
+                    <input type="submit" name="action" value="Edit" class="btn btn-sm btn-primary"/>
+                    <input type="hidden" name="id" value="<?php echo $row['license_id']; ?>"/>
                 </form>
                 </td>
             </tr>
             <?php endwhile; ?>
+            </tbody>
         </table>
     </form>
     <br><br>
