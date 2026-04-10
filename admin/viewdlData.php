@@ -1,10 +1,10 @@
 <?php
     session_start();
-    $loggedin = $_SESSION['loggedin'];
-    if ($loggedin == 0)
+    //$loggedin = $_SESSION['loggedin'];
+    if (empty($_SESSION['loggedin'])) 
     {
-        header("Location: adminLogin.php");
         session_destroy();
+        header("Location: adminLogin.php");
         die();
     }
     if (isset($_POST['adminPanel']))
@@ -15,8 +15,49 @@
     require_once('../config/Connection.php');
     $obj = new Connection();
     $db = $obj->getNewConnection();
-    $sql = "select * from dl";
+    //$sql = "select * from dl";
+    $sql = "SELECT l.license_id,
+        l.licenseNumber,
+        l.licenseType,
+        l.issueDate,
+        l.examDate,
+        l.status,
+        l.validityDate,
+        l.createdAt,
+        p.person_id,
+        p.aadhar,
+        p.name,
+        p.fatherName,
+        p.dob,
+        p.bloodGroup,
+        p.gender,
+        p.address,
+        p.mobileNumber,
+        p.email,
+        r.rto_id,
+        r.rtoCode,
+        r.rtoName,
+        v.class_id,
+        v.classCode,
+        v.classDescription
+        FROM licenses l
+        JOIN person p ON l.person_id = p.person_id
+        JOIN vehicleclasses v ON l.class_id = v.class_id
+        JOIN rtooffices r ON l.rto_id = r.rto_id
+        WHERE l.licenseType = 'LL' && l.status = 'approved'
+        ORDER BY l.issueDate DESC";
+
     $res = $db->query($sql);
+    
+    if (!$res) {
+        die("Query failed: no result found " . $db->error);
+    }
+    
+    if ($res->num_rows == 0) {
+        // No DL records found, redirect to admin panel
+        echo "<div class='alert alert-info'>No DL records found.</div>";
+        exit();
+    }
     if (isset($_POST['action']) && isset($_POST['id'])) {
         if ($_POST['action'] == 'Edit') {
             $_SESSION['aadhar'] = $_POST['id'];
@@ -38,28 +79,45 @@
     <?php require_once('../includes/header.php'); ?>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> View DL Data </h1>
     <form method="post">
-        <table class="table">
-            <thead>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark text-center">
             <tr>
-                <th scope="col">Aadhar Number</th>
-                <th scope="col">DL No</th>
-                <th scope="col">Name</th>
-                <th scope="col"> Edit</th>
+                <th scope="col">License Number</th>
+            <th scope="col">Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Aadhar</th>
+            <th scope="col">DOB</th>
+            <th scope="col">Vehicle Class</th>
+            <th scope="col">RTO</th>
+            <th scope="col">Learner Status</th>
             </tr>
             </thead>
             <tbody>
             <?php while ($row = $res->fetch_assoc()) : ?>
-            <tr>
-                <td><?php echo $row['aadhar'] ?></td>
-                <td><?php echo $row['dlno'] ?></td>
+            <td><?php echo $row['licenseNumber'] ?></td>
                 <td><?php echo $row['name'] ?></td>
+                <td><?php echo $row['fatherName'] ?></td>
+                <td><?php echo $row['aadhar'] ?></td>
+                <td><?php echo $row['dob'] ?></td>
+                
+                <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
+                <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
+                <td>
+                    <span class="badge badge-<?php 
+                        echo $row['status'] == 'approved' ? 'success' : 
+                            ($row['status'] == 'pending' ? 'warning' : 
+                            ($row['status'] == 'rejected' ? 'danger' : 'secondary')); 
+                    ?>">
+                        <?php echo ucfirst($row['status']) ?>
+                    </span>
+                </td>
+                
                 <td>
                 <form method="post">
-                    <input type="submit" name="action" value="Edit"/>
-                    <input type="hidden" name="id" value="<?php echo $row['aadhar']; ?>"/>
+                    <input type="submit" name="action" value="Edit" class="btn btn-sm btn-primary"/>
+                    <input type="hidden" name="id" value="<?php echo $row['license_id']; ?>"/>
                 </form>
                 </td>
-            </tr>
             <?php endwhile; ?>
         </table>
     </form>
