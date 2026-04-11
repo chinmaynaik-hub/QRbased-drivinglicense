@@ -60,8 +60,8 @@
     }
     if (isset($_POST['action']) && isset($_POST['id'])) {
         if ($_POST['action'] == 'Edit') {
-            $_SESSION['aadhar'] = $_POST['id'];
-            header('Location: editdlData.php');
+            $_SESSION['license_id'] = $_POST['id'];
+            header('Location: editdldata.php');
             die();
         }
     }

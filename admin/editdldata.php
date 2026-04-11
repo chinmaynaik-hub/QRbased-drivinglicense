@@ -1,24 +1,64 @@
 <?php
     session_start();
     require_once('../config/Connection.php');
-    $aadhar = $_SESSION['aadhar'];
+    
+    // Get license_id from session (set in viewdlData.php)
+    if (!isset($_SESSION['license_id'])) {
+        echo "Debug: Session license_id not set<br>";
+        echo "Available session variables: ";
+        print_r($_SESSION);
+        die("<br>Error: No license selected. Please go back to <a href='viewdlData.php'>View DL Data</a>");
+    }
+    
+    $license_id = $_SESSION['license_id'];
+    echo "Debug: license_id = $license_id<br>";
+    
     $obj = new Connection();
     $db = $obj->getNewConnection();
     
-    // First get the existing DL data
-    $sql = "SELECT * FROM dl WHERE aadhar=$aadhar";
+    // Get existing DL data with JOINs
+    $sql = "SELECT 
+                l.license_id,
+                l.licenseNumber,
+                l.status,
+                l.issueDate,
+                l.examDate,
+                l.validityDate,
+                p.person_id,
+                p.aadhar,
+                p.name,
+                p.fatherName,
+                p.dob,
+                p.bloodGroup,
+                p.gender,
+                p.address,
+                p.mobileNumber,
+                p.email,
+                r.rto_id,
+                r.rtoName,
+                r.rtoCode,
+                vc.class_id,
+                vc.classCode,
+                vc.classDescription
+            FROM licenses l 
+            JOIN person p ON l.person_id = p.person_id
+            JOIN rtooffices r ON l.rto_id = r.rto_id
+            JOIN vehicleclasses vc ON l.class_id = vc.class_id
+            WHERE l.license_id = $license_id && status = 'approved'";
+    
     $res = $db->query($sql);
+    
+    if (!$res) {
+        die("Query error: " . $db->error);
+    }
+    
+    if ($res->num_rows == 0) {
+        die("License not found. Please go back to <a href='viewdlData.php'>View DL Data</a>");
+    }
+    
     $row = $res->fetch_assoc();
-    $vehicleType = $row['licenseType'];
-    $vtype = explode(',', $vehicleType);
     
     if (isset($_POST['submit'])) {
-        // First fetch the llno from ll table
-        $llQuery = "SELECT llno FROM ll WHERE aadhar=$aadhar";
-        $llResult = $db->query($llQuery);
-        $llData = $llResult->fetch_assoc();
-        $llno = $llData['llno'];
-        
         $name = $_POST['name'];
         $fatherName = $_POST['fatherName'];
         $dob = $_POST['dob'];
@@ -27,23 +67,41 @@
         $gender = $_POST['gender'];
         $mobileNumber = $_POST['mobileNumber'];
         $email = $_POST['email'];
-        $rto = $_POST['rto'];
+        $rto_id = $_POST['rto_id'];
         $status = $_POST['status'];
-        $validity = $_POST['validity'];
+        $validityDate = $_POST['validity'];
         $issueDate = $_POST['issueDate'];
-        $selectedLicenseTypes = isset($_POST['licenseType']) ? implode(',', $_POST['licenseType']) : '';
-
-        $q = "UPDATE dl 
-              SET name='$name', dlno=$llno, LastName='$fatherName', 
-              dob='$dob', bloodGroup='$bloodGroup', address='$address', gender='$gender', 
-              mobileNumber=$mobileNumber, email='$email', rto='$rto', status=$status, 
-              validity='$validity', issueDate='$issueDate', licenseType='$selectedLicenseTypes' 
-              WHERE aadhar=$aadhar"; 
         
-        $res1 = $db->query($q);
-        if (!$res1) {
-            die($db->error);
+        $person_id = $row['person_id'];
+        
+        // Update person table
+        $query_person = "UPDATE person 
+                        SET name='$name', 
+                            fatherName='$fatherName', 
+                            dob='$dob', 
+                            bloodGroup='$bloodGroup', 
+                            address='$address', 
+                            gender='$gender', 
+                            mobileNumber='$mobileNumber', 
+                            email='$email'
+                        WHERE person_id=$person_id";
+        
+        $result_person = $db->query($query_person);
+        
+        // Update licenses table
+        $query_licenses = "UPDATE licenses 
+                          SET rto_id=$rto_id,
+                              status='$status',
+                              validityDate='$validityDate',
+                              issueDate='$issueDate'
+                          WHERE license_id=$license_id";
+        
+        $result_licenses = $db->query($query_licenses);
+        
+        if (!$result_licenses || !$result_person) {
+            die("Update failed: " . $db->error);
         }
+        
         $db->close();
         header("Location: viewdlData.php");
         exit();
@@ -56,39 +114,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Edit DL Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php require_once('../includes/header.php'); ?>
 </head>
 <body>
+    <?php require_once('../includes/header.php'); ?>
     <br>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> Edit DL Data </h1>
     <div class="container"><br>
         <div class="col-lg-6 m-auto d-block">
-            <form method="POST" onsubmit="return validation()" class="bg-light">
+            <form method="POST" onsubmit="return validation()" class="bg-light p-3">
                 <div class="form-group">
                     <label for="name" class="font-weight-bold"> Name: </label>
                     <input type="text" name="name" class="form-control" id="name" value="<?php echo htmlspecialchars($row['name']); ?>">
                     <span id="nameerr" class="text-danger font-weight-bold"> </span>
                 </div>
                 <div class="form-group">
-                    <label for="dlno" class="font-weight-bold"> DL No: </label>
-                    <?php 
-                        // Fetch llno from ll table to display (readonly)
-                        $llQuery = "SELECT llno FROM ll WHERE aadhar=$aadhar";
-                        $llResult = $db->query($llQuery);
-                        $llData = $llResult->fetch_assoc();
-                        $llno = $llData['llno'];
-                    ?>
-                    <input type="number" name="dlno" class="form-control" id="dlno" value="<?php echo htmlspecialchars($llno); ?>" readonly>
-                    <span id="dlnoerr" class="text-danger font-weight-bold"> </span>
+                    <label for="licenseNumber" class="font-weight-bold"> DL Number: </label>
+                    <input type="text" name="licenseNumber" class="form-control" value="<?php echo htmlspecialchars($row['licenseNumber']); ?>" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="fatherName" class="font-weight-bold"> Last Name: </label>
-                    <input type="text" name="fatherName" class="form-control" id="fatherName" value="<?php echo htmlspecialchars($row['LastName']); ?>">
+                    <label for="fatherName" class="font-weight-bold"> Father Name: </label>
+                    <input type="text" name="fatherName" class="form-control" id="fatherName" value="<?php echo htmlspecialchars($row['fatherName']); ?>">
                     <span id="fatherNameerr" class="text-danger font-weight-bold"> </span>
                 </div>
                 <div class="form-group">
                     <label for="dob" class="font-weight-bold"> DOB: </label>
-                    <input type="text" name="dob" class="form-control" id="dob" value="<?php echo htmlspecialchars($row['dob']); ?>">
+                    <input type="date" name="dob" class="form-control" id="dob" value="<?php echo htmlspecialchars($row['dob']); ?>">
                     <span id="doberr" class="text-danger font-weight-bold"> </span>
                 </div>
                 <div class="form-group">
@@ -106,12 +156,12 @@
                     <label class="font-weight-bold d-block">Select Gender:</label>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" 
-                            <?php echo ($row['gender'] == 'Ma') ? 'checked' : ''; ?>>
+                            <?php echo ($row['gender'] == 'Male' || $row['gender'] == 'Ma' || $row['gender'] == 'M') ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="genderMale">Male</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female"
-                            <?php echo ($row['gender'] == 'Fe') ? 'checked' : ''; ?>>
+                            <?php echo ($row['gender'] == 'Female' || $row['gender'] == 'Fe' || $row['gender'] == 'F') ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="genderFemale">Female</label>
                     </div>
                     <span id="gendererr" class="text-danger font-weight-bold"></span>
@@ -129,42 +179,32 @@
                 </div>
                 <div class="form-group">
                     <label for="rto" class="font-weight-bold"> RTO: </label>
-                    <input type="text" name="rto" class="form-control" id="rto" value="<?php echo htmlspecialchars($row['rto']); ?>">
-                    <span id="rtoerr" class="text-danger font-weight-bold"> </span>
+                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($row['rtoName'] . ' (' . $row['rtoCode'] . ')'); ?>" readonly>
+                    <input type="hidden" name="rto_id" value="<?php echo $row['rto_id']; ?>">
                 </div>
                 
                 <div class="form-group">
-                    <label class="font-weight-bold"> Select License Type: </label><br>
-                    <input type="checkbox" name="licenseType[]" value="MCWOG" id="mcwog" 
-                        <?php echo in_array('MCWOG', $vtype) ? 'checked' : ''; ?>>
-                    <label for="mcwog" style="margin-left: 5px;"> MCWOG </label><br>
-                    <input type="checkbox" name="licenseType[]" value="MCWG" id="mcwg"
-                        <?php echo in_array('MCWG', $vtype) ? 'checked' : ''; ?>>
-                    <label for="mcwg" style="margin-left: 5px;"> MCWG </label><br>
-                    <input type="checkbox" name="licenseType[]" value="LMV" id="lmv"
-                        <?php echo in_array('LMV', $vtype) ? 'checked' : ''; ?>>
-                    <label for="lmv" style="margin-left: 5px;"> LMV </label><br>
-                    <input type="checkbox" name="licenseType[]" value="HMV" id="hmv"
-                        <?php echo in_array('HMV', $vtype) ? 'checked' : ''; ?>>
-                    <label for="hmv" style="margin-left: 5px;"> HMV </label><br>
-                    <span id="licenseTypeerr" class="text-danger font-weight-bold"> </span>
+                    <label for="classCode" class="font-weight-bold"> Vehicle Class: </label>
+                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($row['classCode'] . ' - ' . $row['classDescription']); ?>" readonly>
                 </div>
                 
                 <div class="form-group">
                     <label for="status" class="font-weight-bold">Status:</label>
                     <select name="status" class="form-control" id="status">
-                        <option value="0" <?php echo ($row['status'] == 0) ? 'selected' : ''; ?>>Not Approved</option>
-                        <option value="1" <?php echo ($row['status'] == 1) ? 'selected' : ''; ?>>Approved</option>
+                        <option value="pending" <?php echo ($row['status'] == 'pending') ? 'selected' : ''; ?>>Pending</option>
+                        <option value="approved" <?php echo ($row['status'] == 'approved') ? 'selected' : ''; ?>>Approved</option>
+                        <option value="rejected" <?php echo ($row['status'] == 'rejected') ? 'selected' : ''; ?>>Rejected</option>
+                        <option value="expired" <?php echo ($row['status'] == 'expired') ? 'selected' : ''; ?>>Expired</option>
                     </select>
                     <span id="statuserr" class="text-danger font-weight-bold"></span>
                 </div>
                 <div class="form-group">
-                    <label for="validity" class="font-weight-bold"> Validity </label>
-                    <input type="date" name="validity" class="form-control" id="validity" value="<?php echo htmlspecialchars($row['validity']); ?>">
+                    <label for="validity" class="font-weight-bold"> Validity: </label>
+                    <input type="date" name="validity" class="form-control" id="validity" value="<?php echo htmlspecialchars($row['validityDate']); ?>">
                     <span id="validityerr" class="text-danger font-weight-bold"> </span>
                 </div>
                 <div class="form-group">
-                    <label for="issueDate" class="font-weight-bold"> Issue Date </label>
+                    <label for="issueDate" class="font-weight-bold"> Issue Date: </label>
                     <input type="date" name="issueDate" class="form-control" id="issueDate" value="<?php echo htmlspecialchars($row['issueDate']); ?>">
                     <span id="issueDateerr" class="text-danger font-weight-bold"> </span>
                 </div>
@@ -176,14 +216,12 @@
 
     <script type="text/javascript">
         function validation() {
-            // Reset error messages
             document.querySelectorAll('.text-danger').forEach(function(el) {
                 el.innerHTML = '';
             });
 
             var isValid = true;
             
-            // Validate each field
             var name = document.getElementById('name').value;
             if (name.trim() === "") {
                 document.getElementById('nameerr').innerHTML = " ** Please fill the name field";
@@ -192,7 +230,7 @@
 
             var fatherName = document.getElementById('fatherName').value;
             if (fatherName.trim() === "") {
-                document.getElementById('fatherNameerr').innerHTML = " ** Please fill the lastName field";
+                document.getElementById('fatherNameerr').innerHTML = " ** Please fill the father name field";
                 isValid = false;
             }
 
@@ -232,24 +270,6 @@
                 isValid = false;
             }
 
-            var rto = document.getElementById('rto').value;
-            if (rto.trim() === "") {
-                document.getElementById('rtoerr').innerHTML = " ** Please fill the RTO field";
-                isValid = false;
-            }
-
-            var licenseTypeChecked = document.querySelectorAll('input[name="licenseType[]"]:checked').length > 0;
-            if (!licenseTypeChecked) {
-                document.getElementById('licenseTypeerr').innerHTML = " ** Please select at least one license type";
-                isValid = false;
-            }
-
-            var status = document.getElementById('status').value;
-            if (status === "") {
-                document.getElementById('statuserr').innerHTML = " ** Please select a status";
-                isValid = false;
-            }
-
             var validity = document.getElementById('validity').value;
             if (validity.trim() === "") {
                 document.getElementById('validityerr').innerHTML = " ** Please fill the validity field";
@@ -267,16 +287,10 @@
     </script>
 
     <?php require_once('../includes/footer.php'); ?>
-    <!-- ##### All Javascript Script ##### -->
-    <!-- jQuery-2.2.4 js -->
     <script src="../assets/js/jquery/jquery-2.2.4.min.js"></script>
-    <!-- Popper js -->
     <script src="../assets/js/bootstrap/popper.min.js"></script>
-    <!-- Bootstrap js -->
     <script src="../assets/js/bootstrap/bootstrap.min.js"></script>
-    <!-- All Plugins js -->
     <script src="../assets/js/plugins/plugins.js"></script>
-    <!-- Active js -->
     <script src="../assets/js/active.js"></script>
 </body>
 </html>
