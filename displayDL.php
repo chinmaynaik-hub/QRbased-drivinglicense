@@ -4,43 +4,6 @@ if (!isset($_SESSION['aadhar'])) {
     header("Location: newDL.php");
     exit();
 }
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    require_once('config/Connection.php');
-    
-    $llno = $_POST['llno'];
-    $aadhar = $_POST['aadhar'];
-    $obj = new Connection();
-    $db = $obj->getNewConnection();
-    
-    $llnoerr = '';
-    $aadharerr = '';
-    
-    $sql = "SELECT * FROM ll WHERE llno=? AND aadhar=?";
-    $stmt = $db->prepare($sql);
-    $stmt->bind_param("ss", $llno, $aadhar);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    
-    if (!$row) {
-        $llnoerr = "Invalid LL no or Aadhar no";
-    } else {
-        $rto = $row['rto'];
-        if ($row['status'] == 0) {
-            $aadharerr = "Status Pending";
-        } elseif ($row['llno'] === $llno && $row['aadhar'] === $aadhar) {
-            $_SESSION['llno'] = $llno;
-            $_SESSION['aadhar'] = $aadhar;
-            $_SESSION['rto'] = $rto;
-            
-            header("Location: confirmll.php");
-            die();
-        }
-    }
-    
-    $db->close();
-}
 ?>
 
 <!DOCTYPE html>
@@ -50,70 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Submitted DL Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Custom CSS -->
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Roboto', sans-serif;
+            background-color: rgba(96, 157, 219, 0.36);
         }
-        .container {
-            margin-top: 50px;
-        }
-        .card {
+        .card-custom {
             background-color: #ffffff;
             border: none;
             border-radius: 10px;
             box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-        .alert-link {
-            color: #155724;
-        }
-        .list-group-item {
-            border: none;
-            padding: 15px;
-        }
-        .list-group-item.text-right {
-            text-align: right;
-            font-weight: 500;
-        }
-        .list-group-item.text-muted {
-            color: #6c757d;
-            font-weight: 700;
-        }
-        .pull-left {
-            float: left;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        .btn-success:focus {
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.5);
-        }
-        .alert {
-            border-radius: 5px;
-            padding: 15px;
-            font-size: 1rem;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
+            padding: 30px;
         }
         .status-badge {
-            padding: 5px 15px;
+            padding: 8px 20px;
             border-radius: 20px;
             font-weight: bold;
             text-transform: uppercase;
@@ -130,31 +44,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="col-lg-6 m-auto d-block">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title text-center">Submitted Data</h3>
-                    <?php
-                    if (isset($_SESSION['aadhar'])) {
-                        require_once('config/Connection.php');
-                        $aadhar = $_SESSION['aadhar'];
-                        $rto = $_SESSION['rto'];
-                        $obj = new Connection();
-                        $db = $obj->getNewConnection();
-                        $sql = "SELECT * FROM dl WHERE aadhar=?";
-                        $stmt = $db->prepare($sql);
+    <?php require_once('includes/header.php'); ?>
+    
+    <div class="container my-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card-custom">
+                <h3 class="text-center bg-warning text-white p-3 rounded mb-4">DL APPLICATION SUBMITTED</h3>
+                
+                <?php
+                if (isset($_SESSION['aadhar'])) {
+                    require_once('config/Connection.php');
+                    $aadhar = $_SESSION['aadhar'];
+                    $rto = isset($_SESSION['rto']) ? $_SESSION['rto'] : 'N/A';
+                    
+                    $obj = new Connection();
+                    $db = $obj->getNewConnection();
+                    
+                    // Query the licenses table with normalized schema
+                    $sql = "SELECT l.license_id, l.licenseNumber, l.examDate, l.status, l.validityDate,
+                            r.rtoName, r.rtoCode,
+                            vc.classCode, vc.classDescription
+                            FROM licenses l
+                            JOIN person p ON l.person_id = p.person_id
+                            JOIN rtooffices r ON l.rto_id = r.rto_id
+                            JOIN vehicleclasses vc ON l.class_id = vc.class_id
+                            WHERE p.aadhar = ? AND l.licenseType = 'DL'
+                            ORDER BY l.license_id DESC
+                            LIMIT 1";
+                    
+                    $stmt = $db->prepare($sql);
+                    
+                    if ($stmt === false) {
+                        echo "<div class='alert alert-danger'>Error preparing statement: " . $db->error . "</div>";
+                    } else {
                         $stmt->bind_param("s", $aadhar);
                         $stmt->execute();
                         $result = $stmt->get_result();
                         $row = $result->fetch_assoc();
 
                         if (!$row) {
-                            echo "<p class='alert alert-danger text-center'>No data found for the provided Aadhar.</p>";
+                            echo "<p class='alert alert-danger text-center'>No DL application found for the provided Aadhar.</p>";
                         } else {
                             $status = $row['status'];
-                            $id = $row['id'];
+                            $license_id = $row['license_id'];
+                            $licenseNumber = $row['licenseNumber'];
                             $examDate = $row['examDate'];
+                            $validityDate = $row['validityDate'];
+                            $rtoDisplay = $row['rtoName'] . ' (' . $row['rtoCode'] . ')';
+                            $vehicleClass = $row['classCode'] . ' - ' . $row['classDescription'];
 
                             // Convert status to human-readable format
                             $statusText = $status == 1 ? 'Approved' : 'Pending';
@@ -162,38 +99,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             
                             echo "<div class='row'>
                                     <div class='col-lg-12'>
-                                    <ul class='list-group'>
-                                    <li class='list-group-item text-muted' contenteditable='false'><center>DL Status</center></li>
-                                    
-                                    <li class='list-group-item text-right'>
-                                        <span class='pull-left'><strong>Status:</strong></span>
-                                        <span class='status-badge $statusClass'>$statusText</span>
-                                    </li>
-                                    
-                                    <li class='list-group-item text-right'><span class='pull-left'><strong>Test Date:</strong></span>$examDate</li>
-                                    <li class='list-group-item text-right'><span class='pull-left'><strong>RTO Office:</strong></span>$rto</li>
-                                    <li class='list-group-item text-right'><span class='pull-left'><strong>Unique ID:</strong></span>$id</li>
-                                    </ul>
+                                        <ul class='list-group list-group-flush'>
+                                            <li class='list-group-item bg-warning text-white text-center font-weight-bold'>
+                                                DL APPLICATION STATUS
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>DL Number:</span>
+                                                <span class='text-dark'>$licenseNumber</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>Status:</span>
+                                                <span class='status-badge $statusClass'>$statusText</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>Test Date:</span>
+                                                <span class='text-dark'>" . date('d-M-Y', strtotime($examDate)) . "</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>Validity:</span>
+                                                <span class='text-dark'>" . date('d-M-Y', strtotime($validityDate)) . "</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>Vehicle Class:</span>
+                                                <span class='text-dark'>$vehicleClass</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>RTO Office:</span>
+                                                <span class='text-dark'>$rtoDisplay</span>
+                                            </li>
+                                            
+                                            <li class='list-group-item d-flex justify-content-between align-items-center py-3'>
+                                                <span class='font-weight-bold text-dark'>Application ID:</span>
+                                                <span class='text-dark'>$license_id</span>
+                                            </li>
+                                        </ul>
                                     </div>
                                   </div>";
                         }
+                        $stmt->close();
                     }
-                    ?>
-                    <h3 class="text-success text-center">Form Submitted Successfully</h3>
-                    <div class="text-center">
-                        <a href="index.php" class="btn btn-success mt-3">Go to Home</a>
-                    </div>
+                    $db->close();
+                }
+                ?>
+                
+                <div class="alert alert-success text-center mt-4" role="alert">
+                    <i class="fa fa-check-circle mr-2"></i>
+                    <strong>Form Submitted Successfully!</strong>
+                </div>
+                
+                <div class="text-center">
+                    <a href="/RTO_Bheemanna/index.php" class="btn btn-success btn-lg px-5 py-2 rounded-pill">
+                        <i class="fa fa-home mr-2"></i> Go to Home
+                    </a>
                 </div>
             </div>
-            <br>
         </div>
     </div>
+    
+    <?php require_once('includes/footer.php'); ?>
+    
     <!-- ##### All Javascript Script ##### -->
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <!-- Popper.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
+    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
 </body>
 </html>
