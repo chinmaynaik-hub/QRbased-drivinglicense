@@ -94,8 +94,8 @@ $res = $stmt->get_result();
                                 <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
                                 <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
                                 <td>
-                                    <span class="badge badge-<?php echo $row['status'] == 1 ? 'success' : ($row['status'] == 0 ? 'warning' : 'danger'); ?>">
-                                        <?php echo $row['status'] == 1 ? 'Approved' : ($row['status'] == 0 ? 'Pending' : 'Rejected'); ?>
+<span class="badge badge-<?php echo $row['status'] == 'approved' ? 'success' : ($row['status'] == 'pending' ? 'warning' : 'danger'); ?>">
+                                        <?php echo ucfirst($row['status']); ?>
                                     </span>
                                 </td>
                             </tr>
