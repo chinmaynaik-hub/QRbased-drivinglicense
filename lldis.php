@@ -7,6 +7,24 @@ if (!isset($_SESSION['aadhar']) || !isset($_SESSION['status'])) {
 
 $aadhar = $_SESSION['aadhar'];
 $status = $_SESSION['status'];
+
+// Fetch license details from database
+require_once('config/Connection.php');
+$obj = new Connection();
+$db = $obj->getNewConnection();
+
+$sql = "SELECT l.license_id, l.licenseNumber, p.name, p.fatherName, p.aadhar, p.dob, 
+        vc.classCode, vc.classDescription, r.rtoName, r.rtoCode, l.status
+        FROM licenses l
+        JOIN person p ON l.person_id = p.person_id
+        JOIN vehicleclasses vc ON l.class_id = vc.class_id
+        JOIN rtooffices r ON l.rto_id = r.rto_id
+        WHERE p.aadhar = ? AND l.licenseType = 'LL'";
+
+$stmt = $db->prepare($sql);
+$stmt->bind_param("s", $aadhar);
+$stmt->execute();
+$res = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -16,6 +34,7 @@ $status = $_SESSION['status'];
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>LL Status</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,7 +43,7 @@ $status = $_SESSION['status'];
             padding: 0;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 50px auto;
             padding: 20px;
             background-color: #fff;
@@ -34,55 +53,71 @@ $status = $_SESSION['status'];
         h1 {
             text-align: center;
             color: #333;
-        }
-        .status {
-            font-size: 20px;
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #e0f7fa;
-            border: 2px solid #00897b;
-            border-radius: 8px;
-            color: #00695c;
-        }
-        .status.pending {
-            background-color: #ffebee;
-            border: 2px solid #d32f2f;
-            color: #c62828;
-        }
-        .btn-success {
-            display: inline-block;
-            font-size: 16px;
-            padding: 10px 20px;
-            color: #fff;
-            background-color: #28a745;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .btn-success:hover {
-            background-color: #218838;
+            margin-bottom: 30px;
         }
         .btn-container {
             text-align: center;
             margin-top: 30px;
+        }
+        .table {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Learning License Status</h1>
-        <?php if ($status == 0): ?>
-            <div class="status pending">Pending</div>
+        
+        <?php if ($res->num_rows > 0): ?>
+            <form method="post">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark text-center">
+                        <tr>
+                            <th scope="col">License Number</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Aadhar</th>
+                            <th scope="col">DOB</th>
+                            <th scope="col">Vehicle Class</th>
+                            <th scope="col">RTO</th>
+                            <th scope="col">Learner Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $res->fetch_assoc()) : ?>
+                            <tr>
+                                <td><?php echo $row['licenseNumber'] ?></td>
+                                <td><?php echo $row['name'] ?></td>
+                                <td><?php echo $row['fatherName'] ?></td>
+                                <td><?php echo $row['aadhar'] ?></td>
+                                <td><?php echo $row['dob'] ?></td>
+                                <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
+                                <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
+                                <td>
+                                    <span class="badge badge-<?php echo $row['status'] == 1 ? 'success' : ($row['status'] == 0 ? 'warning' : 'danger'); ?>">
+                                        <?php echo $row['status'] == 1 ? 'Approved' : ($row['status'] == 0 ? 'Pending' : 'Rejected'); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </form>
         <?php else: ?>
-            <div class="status">You can now apply for the DL with your LL number</div>
+            <div class="alert alert-warning text-center">No license records found.</div>
         <?php endif; ?>
+        
         <div class="btn-container">
-            <a href="index.php" class="btn-success">Go to Home</a>
+            <a href="index.php" class="btn btn-success">Go to Home</a>
         </div>
     </div>
+    
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
 </body>
 </html>
+
+<?php
+$stmt->close();
+$db->close();
+?>

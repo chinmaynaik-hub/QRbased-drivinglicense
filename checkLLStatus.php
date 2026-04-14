@@ -14,9 +14,13 @@ if (isset($_POST['submit'])) {
     
     $obj = new Connection();
     $db = $obj->getNewConnection();
-    $sql = "SELECT aadhar, llno, status FROM ll WHERE aadhar= ? AND llno=?";
+    $sql = "SELECT p.aadhar, l.licenseNumber, l.status 
+            FROM licenses l 
+            JOIN person p ON l.person_id = p.person_id 
+            WHERE p.aadhar = ? AND l.licenseNumber LIKE ? AND l.licenseType = 'LL'";
     $stmt = $db->prepare($sql);
-    $stmt->bind_param("ss", $aadhar, $llnumber);
+    $llnumber_like = "%$llnumber%";
+    $stmt->bind_param("ss", $aadhar, $llnumber_like);
     $stmt->execute();
     $res = $stmt->get_result();
     $row = $res->fetch_assoc();
@@ -25,7 +29,7 @@ if (isset($_POST['submit'])) {
 
     if ($row) {
         $_SESSION['aadhar'] = $aadhar;
-        $_SESSION['llno'] = $llnumber;
+        $_SESSION['llno'] = $row['licenseNumber'];
         $_SESSION['status'] = $row['status'];
         header('Location: lldis.php');
         exit();
