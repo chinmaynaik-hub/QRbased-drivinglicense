@@ -118,7 +118,7 @@
                         $sql_license = "INSERT INTO licenses 
                                        (licenseNumber, person_id, licenseType, class_id, rto_id, issueDate, examDate, validityDate, status) 
                                        VALUES 
-                                       ('$licenseNumber', $person_id, 'LL', $class_id, $rto_id, '$issueDate', '$examDate', '$validityDate', 0)";
+                                       ('$licenseNumber', $person_id, 'LL', $class_id, $rto_id, '$issueDate', '$examDate', '$validityDate', 'pending')";
                         
                         $res_license = $db->query($sql_license);
                         
