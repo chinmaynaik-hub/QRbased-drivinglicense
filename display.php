@@ -72,9 +72,9 @@
                     <p><strong>RTO Office:</strong> <?php echo $_SESSION['rto']; ?></p>
                     <!--<p><strong>Unique ID:</strong> <?php echo $_SESSION['id']; ?></p>-->
                     <p><strong>Exam date : </strong> <?php echo $_SESSION['examDate']; ?></p>
-                    <p><strong>License Type:</strong> <?php echo $_SESSION['licenseType']; ?></p>
+                    <p><strong>License Type:</strong> <?php echo  $_SESSION['licenseType']; ?></p>
                     <div class="showllno">
-                        <p><strong>Learning License Number:</strong> <?php echo $_SESSION['llno']; ?></p>
+                        <p><strong>Learning License Number:</strong> <?php echo "LL_".$_SESSION['llno']; ?></p>
                     </div>
                     
                     <h3 class="text-success text-center">Form Submitted Successfully</h3>

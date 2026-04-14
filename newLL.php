@@ -81,7 +81,7 @@
 
                 // we should have all the details before
                 // we should only fetch from here
-                $sql_rto = "SELECT rto_id FROM rtooffices where rto_id = '$rto' limit 1";
+                $sql_rto = "SELECT rto_id FROM rtooffices where rtoName = '$rto' limit 1";
                 $res_rto = $db->query($sql_rto);
 
                 if($res_rto->num_rows > 0){
