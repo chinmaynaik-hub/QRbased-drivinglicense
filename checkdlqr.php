@@ -1,4 +1,5 @@
 <?php
+    //Session starts here
     session_start();
     if (!isset($_SESSION['aadhar'])) {
         header("Location: newDL.php");
