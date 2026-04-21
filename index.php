@@ -15,7 +15,7 @@
     <!-- <link rel="icon" href="img/core-img/favicon.ico"> -->
 
     <!-- Core Stylesheet -->
-    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 
 </head>
 
@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-12 col-md-5">
                             <div class="hero-slides-thumb" >
-                                <img src="/RTO_Bheemanna/assets/img/bg-img/rto.png" alt="">
+                                <img src="assets/img/bg-img/rto.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -55,15 +55,15 @@
     <?php require_once('includes/footer.php'); ?>
     <!-- ##### All Javascript Script ##### -->
     <!-- jQuery-2.2.4 js -->
-    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
+    <script src="assets/js/bootstrap/popper.min.js"></script>
     <!-- Bootstrap js -->
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
     <!-- All Plugins js -->
-    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
+    <script src="assets/js/plugins/plugins.js"></script>
     <!-- Active js -->
-    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
+    <script src="assets/js/active.js"></script>
 </body>
 
 </html>

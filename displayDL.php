@@ -14,7 +14,7 @@ if (!isset($_SESSION['aadhar'])) {
     <title>Submitted DL Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Core Stylesheet -->
-    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body {
             background-color: rgba(96, 157, 219, 0.36);
@@ -154,7 +154,7 @@ if (!isset($_SESSION['aadhar'])) {
                 </div>
                 
                 <div class="text-center">
-                    <a href="/RTO_Bheemanna/index.php" class="btn btn-success btn-lg px-5 py-2 rounded-pill">
+                    <a href="index.php" class="btn btn-success btn-lg px-5 py-2 rounded-pill">
                         <i class="fa fa-home mr-2"></i> Go to Home
                     </a>
                 </div>
@@ -165,10 +165,10 @@ if (!isset($_SESSION['aadhar'])) {
     <?php require_once('includes/footer.php'); ?>
     
     <!-- ##### All Javascript Script ##### -->
-    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/bootstrap/popper.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/js/plugins/plugins.js"></script>
+    <script src="assets/js/active.js"></script>
 </body>
 </html>

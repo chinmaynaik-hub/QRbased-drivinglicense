@@ -112,7 +112,7 @@ if ($result->num_rows > 0) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>QR Code Generated</title>
-        <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
+        <link rel="stylesheet" href="assets/css/style.css">
         <style>
             body {
                 display: flex;
@@ -229,7 +229,7 @@ if ($result->num_rows > 0) {
                 </button>
             </a>
             <br>
-            <a href="/RTO_Bheemanna/index.php" class="home-button">
+            <a href="index.php" class="home-button">
                 <i class="fa fa-home"></i> Go to Home
             </a>
         </div>

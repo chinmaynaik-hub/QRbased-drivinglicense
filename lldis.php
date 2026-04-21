@@ -35,7 +35,7 @@ $res = $stmt->get_result();
     <title>LL Status</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Core Stylesheet -->
-    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body {
             background-color: rgba(199, 219, 96, 0.36);
@@ -197,7 +197,7 @@ $res = $stmt->get_result();
         <?php endif; ?>
         
         <div class="btn-container">
-            <a href="/RTO_Bheemanna/index.php" class="btn-home">Go to Home</a>
+            <a href="index.php" class="btn-home">Go to Home</a>
         </div>
     </div>
     
@@ -205,15 +205,15 @@ $res = $stmt->get_result();
     
     <!-- ##### All Javascript Script ##### -->
     <!-- jQuery-2.2.4 js -->
-    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
+    <script src="assets/js/bootstrap/popper.min.js"></script>
     <!-- Bootstrap js -->
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
     <!-- All Plugins js -->
-    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
+    <script src="assets/js/plugins/plugins.js"></script>
     <!-- Active js -->
-    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
+    <script src="assets/js/active.js"></script>
 </body>
 </html>
 

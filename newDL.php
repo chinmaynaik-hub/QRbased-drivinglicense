@@ -52,7 +52,7 @@
     <title>Apply For New DL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Core Stylesheet -->
-    <link rel="stylesheet" href="/RTO_Bheemanna/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body {
             background-color: rgba(96, 157, 219, 0.36);
@@ -110,7 +110,7 @@
                         <small class="text-muted">
                             <i class="fa fa-info-circle mr-1"></i>
                             Don't have a Learner License? 
-                            <a href="/RTO_Bheemanna/newLL.php" class="font-weight-bold">Apply for LL first</a>
+                            <a href="newLL.php" class="font-weight-bold">Apply for LL first</a>
                         </small>
                     </div>
                 </div>
@@ -153,10 +153,10 @@
     <?php require_once('includes/footer.php'); ?>
     
     <!-- ##### All Javascript Script ##### -->
-    <script src="/RTO_Bheemanna/assets/js/jquery/jquery-2.2.4.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/popper.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/bootstrap/bootstrap.min.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/plugins/plugins.js"></script>
-    <script src="/RTO_Bheemanna/assets/js/active.js"></script>
+    <script src="assets/js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="assets/js/bootstrap/popper.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/js/plugins/plugins.js"></script>
+    <script src="assets/js/active.js"></script>
 </body>
 </html>

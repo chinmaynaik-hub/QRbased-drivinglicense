@@ -90,6 +90,15 @@
 ?>
 
 <html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Edit LL Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
 <?php require_once('../includes/header.php'); ?>
     <br>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> Edit LL Data </h1>

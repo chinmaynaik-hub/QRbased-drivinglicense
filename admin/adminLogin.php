@@ -48,6 +48,8 @@ if (isset($_POST['submit'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Admin Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Core Stylesheet -->
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 <?php require_once('../includes/header.php'); ?>
