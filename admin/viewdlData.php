@@ -80,49 +80,55 @@
 <body>
     <?php require_once('../includes/header.php'); ?>
     <h1 class="text-white text-center font-weight-bold bg-warning" style="font-size: 55px;"> View DL Data </h1>
-    <form method="post">
-        <table class="table table-striped table-bordered">
-            <thead class="thead-dark text-center">
-            <tr>
-                <th scope="col">License Number</th>
-            <th scope="col">Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Aadhar</th>
-            <th scope="col">DOB</th>
-            <th scope="col">Vehicle Class</th>
-            <th scope="col">RTO</th>
-            <th scope="col">Learner Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php while ($row = $res->fetch_assoc()) : ?>
-            <td><?php echo $row['licenseNumber'] ?></td>
-                <td><?php echo $row['name'] ?></td>
-                <td><?php echo $row['fatherName'] ?></td>
-                <td><?php echo $row['aadhar'] ?></td>
-                <td><?php echo $row['dob'] ?></td>
-                
-                <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
-                <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
-                <td>
-                    <span class="badge badge-<?php 
-                        echo $row['status'] == 'approved' ? 'success' : 
-                            ($row['status'] == 'pending' ? 'warning' : 
-                            ($row['status'] == 'rejected' ? 'danger' : 'secondary')); 
-                    ?>">
-                        <?php echo ucfirst($row['status']) ?>
-                    </span>
-                </td>
-                
-                <td>
-                <form method="post">
-                    <input type="submit" name="action" value="Edit" class="btn btn-sm btn-primary"/>
-                    <input type="hidden" name="id" value="<?php echo $row['license_id']; ?>"/>
-                </form>
-                </td>
-            <?php endwhile; ?>
-        </table>
-    </form>
+    <div class="container-fluid">
+        <div class="table-responsive">
+            <form method="post">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark text-center">
+                    <tr>
+                        <th scope="col">License Number</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last Name</th>
+                        <th scope="col">Aadhar</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">Vehicle Class</th>
+                        <th scope="col">RTO</th>
+                        <th scope="col">Learner Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php while ($row = $res->fetch_assoc()) : ?>
+                    <tr>
+                        <td><?php echo $row['licenseNumber'] ?></td>
+                        <td><?php echo $row['name'] ?></td>
+                        <td><?php echo $row['fatherName'] ?></td>
+                        <td><?php echo $row['aadhar'] ?></td>
+                        <td><?php echo $row['dob'] ?></td>
+                        <td><?php echo $row['classCode'] . ' - ' . $row['classDescription'] ?></td>
+                        <td><?php echo $row['rtoName'] . ' (' . $row['rtoCode'] . ')' ?></td>
+                        <td>
+                            <span class="badge badge-<?php 
+                                echo $row['status'] == 'approved' ? 'success' : 
+                                    ($row['status'] == 'pending' ? 'warning' : 
+                                    ($row['status'] == 'rejected' ? 'danger' : 'secondary')); 
+                            ?>">
+                                <?php echo ucfirst($row['status']) ?>
+                            </span>
+                        </td>
+                        <td>
+                            <form method="post">
+                                <input type="submit" name="action" value="Edit" class="btn btn-sm btn-primary"/>
+                                <input type="hidden" name="id" value="<?php echo $row['license_id']; ?>"/>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
     <br><br>
     <form method="post">
         <center><input type="submit" value="Admin Panel" name="adminPanel" class="btn btn-danger"></center>
